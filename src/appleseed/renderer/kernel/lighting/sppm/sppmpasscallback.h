@@ -71,13 +71,13 @@ class SPPMPassCallback
   public:
     // Constructor.
     SPPMPassCallback(
-        const Scene&                scene,
-        const ForwardLightSampler&         light_sampler,
-        const TraceContext&         trace_context,
-        TextureStore&               texture_store,
-        OIIOTextureSystem&          oiio_texture_system,
-        OSLShadingSystem&           shading_system,
-        const SPPMParameters&       params);
+        const Scene&                    scene,
+        const ForwardLightSampler&      light_sampler,
+        const TraceContext&             trace_context,
+        TextureStore&                   texture_store,
+        OIIOTextureSystem&              oiio_texture_system,
+        OSLShadingSystem&               shading_system,
+        const SPPMParameters&           params);
 
     // Delete this instance.
     virtual void release() override;

@@ -167,7 +167,7 @@ namespace
             const Frame&                frame,
             const TraceContext&         trace_context,
             TextureStore&               texture_store,
-            const ForwardLightSampler&         light_sampler,
+            const ForwardLightSampler&  light_sampler,
             const size_t                generator_index,
             const size_t                generator_count,
             OIIOTextureSystem&          oiio_texture_system,
@@ -512,7 +512,7 @@ namespace
         double                          m_safe_scene_diameter;  // world space
         float                           m_disk_point_prob;
 
-        const ForwardLightSampler&             m_light_sampler;
+        const ForwardLightSampler&      m_light_sampler;
         TextureCache                    m_texture_cache;
         Intersector                     m_intersector;
         Arena                           m_arena;
@@ -873,14 +873,14 @@ namespace
 //
 
 LightTracingSampleGeneratorFactory::LightTracingSampleGeneratorFactory(
-    const Project&          project,
-    const Frame&            frame,
-    const TraceContext&     trace_context,
-    TextureStore&           texture_store,
-    const ForwardLightSampler&     light_sampler,
-    OIIOTextureSystem&      oiio_texture_system,
-    OSLShadingSystem&       shading_system,
-    const ParamArray&       params)
+    const Project&                  project,
+    const Frame&                    frame,
+    const TraceContext&             trace_context,
+    TextureStore&                   texture_store,
+    const ForwardLightSampler&      light_sampler,
+    OIIOTextureSystem&              oiio_texture_system,
+    OSLShadingSystem&               shading_system,
+    const ParamArray&               params)
   : m_project(project)
   , m_frame(frame)
   , m_trace_context(trace_context)

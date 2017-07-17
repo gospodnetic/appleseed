@@ -92,8 +92,8 @@ class RendererComponents
     const Scene&                m_scene;
     const Frame&                m_frame;
     const TraceContext&         m_trace_context;
-    ForwardLightSampler*                m_forward_light_sampler;
-    BackwardLightSampler*                m_backward_light_sampler;
+    ForwardLightSampler*        m_forward_light_sampler;
+    BackwardLightSampler*       m_backward_light_sampler;
     ShadingEngine               m_shading_engine;
     TextureStore&               m_texture_store;
     OIIOTextureSystem&          m_texture_system;

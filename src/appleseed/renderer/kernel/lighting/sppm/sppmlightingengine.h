@@ -56,10 +56,10 @@ class SPPMLightingEngineFactory
   public:
     // Constructor.
     SPPMLightingEngineFactory(
-        const SPPMPassCallback&     pass_callback,
-        const ForwardLightSampler&         forward_light_sampler,
-        const BackwardLightSampler&         backward_light_sampler,
-        const SPPMParameters&       params);
+        const SPPMPassCallback&         pass_callback,
+        const ForwardLightSampler&      forward_light_sampler,
+        const BackwardLightSampler&     backward_light_sampler,
+        const SPPMParameters&           params);
 
     // Delete this instance.
     virtual void release() override;
@@ -73,8 +73,8 @@ class SPPMLightingEngineFactory
   private:
     const SPPMParameters            m_params;
     const SPPMPassCallback&         m_pass_callback;
-    const ForwardLightSampler&             m_forward_light_sampler;
-    const BackwardLightSampler&             m_backward_light_sampler;
+    const ForwardLightSampler&      m_forward_light_sampler;
+    const BackwardLightSampler&     m_backward_light_sampler;
 };
 
 }       // namespace renderer

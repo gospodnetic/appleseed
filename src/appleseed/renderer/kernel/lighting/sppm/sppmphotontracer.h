@@ -60,7 +60,7 @@ class SPPMPhotonTracer
   public:
     SPPMPhotonTracer(
         const Scene&                scene,
-        const ForwardLightSampler&         light_sampler,
+        const ForwardLightSampler&  light_sampler,
         const TraceContext&         trace_context,
         TextureStore&               texture_store,
         OIIOTextureSystem&          oiio_texture_system,
@@ -76,7 +76,7 @@ class SPPMPhotonTracer
   private:
     const SPPMParameters            m_params;
     const Scene&                    m_scene;
-    const ForwardLightSampler&             m_light_sampler;
+    const ForwardLightSampler&      m_light_sampler;
     const TraceContext&             m_trace_context;
     TextureStore&                   m_texture_store;
     size_t                          m_total_emitted_photon_count;
