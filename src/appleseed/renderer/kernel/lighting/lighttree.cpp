@@ -272,6 +272,37 @@ std::pair<size_t, float> LightTree::sample(
     return std::pair<size_t, float>(light_index, light_probability);
 }
 
+float LightTree::light_probability(
+    const foundation::Vector3d&     surface_point,
+    const size_t                    leaf_index) const
+{
+    float light_probability = 1.0f;
+    size_t child_index = leaf_index;
+    size_t parent_index = m_nodes[child_index].get_parent();
+
+    while (!m_nodes[parent_index].is_root())
+    {
+        const LightTreeNode<foundation::AABB3d>& node = m_nodes[parent_index];
+
+        float p1, p2;
+        child_node_probabilites(node, surface_point, p1, p2);
+
+        if (node.get_child_node_index() == child_index)
+        {
+            light_probability *= p1;            
+        }
+        else
+        {
+            light_probability *= p2;
+        }
+
+        child_index = parent_index;
+        parent_index = m_nodes[child_index].get_parent();
+    }
+
+    return light_probability;
+}
+
 namespace
 {
     float node_probability(

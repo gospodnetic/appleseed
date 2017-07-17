@@ -119,12 +119,6 @@ class BackwardLightSampler
         const ShadingRay::Time&             time,
         const foundation::Vector3f&         s,
         LightSample&                        light_sample) const;
-
-    // Sample the sets of non-physical lights and emitting triangles.
-    void sample(
-        const ShadingRay::Time&             time,
-        const foundation::Vector3f&         s,
-        LightSample&                        light_sample) const;
     
     // Sample the sets of non-physical lights and emitting triangles using a light-tree.
     void sample(
@@ -133,8 +127,10 @@ class BackwardLightSampler
         const ShadingPoint&                 shading_point,
         LightSample&                        light_sample) const;
 
+    // TODO: switch evaluate_pdf with evaluate_pdf_tree when over.
     // Compute the probability density in area measure of a given light sample.
     float evaluate_pdf(const ShadingPoint& shading_point) const;
+    float evaluate_pdf_tree(const ShadingPoint& shading_point) const;
 
   private:
     struct Parameters

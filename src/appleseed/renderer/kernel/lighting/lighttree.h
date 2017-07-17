@@ -77,6 +77,10 @@ class LightTree
         const foundation::Vector3d&     surface_point,
         const float                     s) const;
 
+    float light_probability(
+        const foundation::Vector3d&     surface_point,
+        const size_t                    leaf_index) const;
+
   private:
     struct Item
     {
