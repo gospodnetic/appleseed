@@ -66,7 +66,7 @@
 #include <string>
 
 // Forward declarations.
-namespace renderer  { class LightSampler; }
+namespace renderer  { class BackwardLightSampler; }
 namespace renderer  { class PixelContext; }
 namespace renderer  { class TextureCache; }
 
@@ -194,7 +194,7 @@ namespace
         };
 
         PTLightingEngine(
-            const LightSampler&     light_sampler,
+            const BackwardLightSampler&     light_sampler,
             const ParamArray&       params)
           : m_params(params)
           , m_light_sampler(light_sampler)
@@ -287,7 +287,7 @@ namespace
 
       private:
         const Parameters                m_params;
-        const LightSampler&             m_light_sampler;
+        const BackwardLightSampler&             m_light_sampler;
 
         uint64                          m_path_count;
         Population<uint64>              m_path_length;
@@ -299,7 +299,7 @@ namespace
         struct PathVisitorBase
         {
             const Parameters&           m_params;
-            const LightSampler&         m_light_sampler;
+            const BackwardLightSampler&         m_light_sampler;
             SamplingContext&            m_sampling_context;
             const ShadingContext&       m_shading_context;
             const EnvironmentEDF*       m_env_edf;
@@ -308,7 +308,7 @@ namespace
 
             PathVisitorBase(
                 const Parameters&       params,
-                const LightSampler&     light_sampler,
+                const BackwardLightSampler&     light_sampler,
                 SamplingContext&        sampling_context,
                 const ShadingContext&   shading_context,
                 const Scene&            scene,
@@ -355,7 +355,7 @@ namespace
         {
             PathVisitorSimple(
                 const Parameters&       params,
-                const LightSampler&     light_sampler,
+                const BackwardLightSampler&     light_sampler,
                 SamplingContext&        sampling_context,
                 const ShadingContext&   shading_context,
                 const Scene&            scene,
@@ -445,7 +445,7 @@ namespace
 
             PathVisitorNextEventEstimation(
                 const Parameters&       params,
-                const LightSampler&     light_sampler,
+                const BackwardLightSampler&     light_sampler,
                 SamplingContext&        sampling_context,
                 const ShadingContext&   shading_context,
                 const Scene&            scene,
@@ -761,7 +761,7 @@ namespace
         struct VolumeVisitorDistanceSampling
         {
             const Parameters&           m_params;
-            const LightSampler&         m_light_sampler;
+            const BackwardLightSampler&         m_light_sampler;
             SamplingContext&            m_sampling_context;
             const ShadingContext&       m_shading_context;
             ShadingComponents&          m_path_radiance;
@@ -770,7 +770,7 @@ namespace
 
             VolumeVisitorDistanceSampling(
                 const Parameters&       params,
-                const LightSampler&     light_sampler,
+                const BackwardLightSampler&     light_sampler,
                 SamplingContext&        sampling_context,
                 const ShadingContext&   shading_context,
                 const Scene&            scene,
@@ -1006,7 +1006,7 @@ namespace
 //
 
 PTLightingEngineFactory::PTLightingEngineFactory(
-    const LightSampler& light_sampler,
+    const BackwardLightSampler& light_sampler,
     const ParamArray&   params)
   : m_light_sampler(light_sampler)
   , m_params(params)

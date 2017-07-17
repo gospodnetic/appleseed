@@ -34,6 +34,7 @@
 // appleseed.renderer headers.
 #include "renderer/kernel/intersection/intersectionsettings.h"
 #include "renderer/kernel/lighting/lightsampler.h"
+#include "renderer/kernel/lighting/lighttree.h"
 #include "renderer/kernel/lighting/lighttypes.h"
 #include "renderer/kernel/shading/shadingray.h"
 #include "renderer/modeling/scene/containers.h"
@@ -119,6 +120,12 @@ class BackwardLightSampler
         const foundation::Vector3f&         s,
         LightSample&                        light_sample) const;
 
+    // Sample the sets of non-physical lights and emitting triangles.
+    void sample(
+        const ShadingRay::Time&             time,
+        const foundation::Vector3f&         s,
+        LightSample&                        light_sample) const;
+    
     // Sample the sets of non-physical lights and emitting triangles using a light-tree.
     void sample(
         const ShadingRay::Time&             time,
