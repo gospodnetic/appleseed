@@ -33,7 +33,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/kernel/intersection/intersectionsettings.h"
-#include "renderer/kernel/lighting/lightsampler.h"
+#include "renderer/kernel/lighting/lightsample.h"
 #include "renderer/kernel/lighting/lighttree.h"
 #include "renderer/kernel/lighting/lighttypes.h"
 #include "renderer/kernel/shading/shadingray.h"
@@ -239,7 +239,7 @@ inline size_t BackwardLightSampler::get_light_tree_light_count() const
 
 inline bool BackwardLightSampler::has_lights_or_emitting_triangles() const
 {
-    return m_non_physical_lights_cdf.valid() || m_emitting_triangles_cdf.valid();
+    return m_non_physical_lights_cdf.valid() || m_emitting_triangles_cdf.valid() || m_light_tree.is_built();
 }
 
 inline void BackwardLightSampler::sample_non_physical_light(

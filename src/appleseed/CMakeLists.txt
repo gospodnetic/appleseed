@@ -989,6 +989,8 @@ set (renderer_kernel_lighting_sources
     renderer/kernel/lighting/ilightingengine.h
     renderer/kernel/lighting/imagebasedlighting.cpp
     renderer/kernel/lighting/imagebasedlighting.h
+    renderer/kernel/lighting/lightsample.cpp
+    renderer/kernel/lighting/lightsample.h
     renderer/kernel/lighting/lightsampler.cpp
     renderer/kernel/lighting/lightsampler.h
     renderer/kernel/lighting/materialsamplers.cpp
