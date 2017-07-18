@@ -569,12 +569,14 @@ float BackwardLightSampler::evaluate_pdf_tree(const ShadingPoint& shading_point)
         shading_point.get_region_index(),
         shading_point.get_primitive_index());
 
-    EmittingTriangle* triangle = m_emitting_triangle_hash_table.get(triangle_key);
+    const EmittingTriangle* triangle = m_emitting_triangle_hash_table.get(triangle_key);
 
     // Traverse the tree and update triangle_prob
-    // const float prob = light_probability()
+    const float prob = m_light_tree.light_probability(
+        shading_point.get_point(),
+        m_currently_sampled_tree_node);
 
-    return triangle->m_triangle_prob * triangle->m_rcp_area;
+    return prob * triangle->m_rcp_area;
 }
 
 void BackwardLightSampler::sample_light_tree_light(
