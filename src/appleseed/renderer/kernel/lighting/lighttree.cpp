@@ -357,14 +357,23 @@ float LightTree::compute_node_probability(
     const float r2 = bbox.square_radius();
     const float rcp_surface_area = 1.0f / r2;
 
-    // Triangle centroid is a more precise position than the center of the bbox.
-    const Item& item = m_items[node.get_item_index()];
-    const Vector3d position = (node.is_leaf() && item.m_light_type == EmittingTriangleType)
-        ? emitting_triangle_centroid(item.m_light_index)
-        : bbox.center();
-
     const Vector3d& surface_point = shading_point.get_point();
 
+    const Item& item = m_items[node.get_item_index()];
+    if (node.is_leaf())
+    {
+        // Triangle centroid is a more precise position than the center of the bbox.
+        const Vector3d position = (item.m_light_type == EmittingTriangleType)
+            ? emitting_triangle_centroid(item.m_light_index)
+            : bbox.center();
+
+        const float distance2 =
+            static_cast<float>(square_distance(surface_point, position));
+
+        return node.get_importance() / distance2;
+    }
+
+    const Vector3d position = bbox.center();
     const float distance2 =
         static_cast<float>(square_distance(surface_point, position));
 
