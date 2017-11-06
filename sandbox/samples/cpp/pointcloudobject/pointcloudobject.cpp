@@ -180,7 +180,7 @@ namespace
                     prim_sphere(p, 0.5f));*/
 // 
             // return prim_mandelbulb(p);
-            return prim_sphere(p, 0.5f);
+            return prim_sphere(p, 0.1f);
         }
 
         //
@@ -216,8 +216,27 @@ namespace
 
         static float prim_sphere(const asf::Vector3f& p, const float radius)
         {
-            asf::Vector3f sphere_origin(0.5f, 0.5f, 0.5f);
-            return asf::norm(p - sphere_origin) - radius;
+            // Sphere origins
+            // Find closest origin
+            // Test if inside
+            std::vector<asf::Vector3f> sphere_origins;
+            sphere_origins.push_back(asf::Vector3f(0.5f, 0.5f, 0.5f));
+            sphere_origins.push_back(asf::Vector3f(-0.9f, -0.9f, 0.5f));
+            sphere_origins.push_back(asf::Vector3f(0.0f, 0.0f, 0.5f));
+
+            size_t closest_sphere_idx = 0;
+            float closest_sphere_distance = asf::norm(p - sphere_origins[closest_sphere_distance]);
+
+            for(size_t i = 1; i < sphere_origins.size(); ++i)
+            {
+                if(asf::norm(p - sphere_origins[i]) < closest_sphere_distance)
+                {
+                    closest_sphere_distance = asf::norm(p - sphere_origins[i]);
+                    closest_sphere_idx = i; 
+                }
+            }
+            // printf("%zd origin index\n", closest_sphere_idx);
+            return asf::norm(p - sphere_origins[closest_sphere_idx]) - radius;
         }
 
         static float prim_cube(asf::Vector3f p, const float half_size)
