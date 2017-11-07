@@ -81,26 +81,28 @@ namespace
           : asr::ProceduralObject(name, params)
           , m_lazy_region_kit(&m_region_kit)
         {
-            // Define sphere origins.
-            m_points.push_back(asf::Vector3f(0.0f, 0.0f, -0.5f));
-            m_points.push_back(asf::Vector3f(0.9f, 0.9f, -1.5f));
-            m_points.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
-            m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
-            m_points.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
-            m_points.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
-            m_points.push_back(asf::Vector3f(0.1f, 0.0f, -0.5f));
-            m_points.push_back(asf::Vector3f(0.3f, 0.2f, -1.5f));
-            m_points.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
-            m_points.push_back(asf::Vector3f(-0.7f, -0.1f, -0.3f));
-            m_points.push_back(asf::Vector3f(0.5f, 0.9f, 1.0f));
-            m_points.push_back(asf::Vector3f(-0.11f, -0.9f, -0.5f));
-            m_points.push_back(asf::Vector3f(-1.0f, 0.0f, -0.5f));
-            m_points.push_back(asf::Vector3f(1.9f, 0.9f, -1.5f));
-            m_points.push_back(asf::Vector3f(0.5f, -0.3f, 0.2f));
-            m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
-            m_points.push_back(asf::Vector3f(0.2f, 0.7f, 1.0f));
-            m_points.push_back(asf::Vector3f(-0.9f, -0.5f, 0.5f));
-
+            // Define a cube.
+            m_points.push_back(asf::Vector3f(-0.5f, -0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f(-0.3f, -0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.3f, -0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.5f,  0.3f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.5f, -0.3f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f, -0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f, -0.3f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.3f, -0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f, -0.5f,  0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f, -0.3f,  0.5f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.3f,  0.5f));
+            m_points.push_back(asf::Vector3f(-0.5f,  0.5f,  0.5f));
+            m_points.push_back(asf::Vector3f(-0.5f, -0.5f,  0.5f));
+            m_points.push_back(asf::Vector3f(-0.3f, -0.5f,  0.5f));
+            m_points.push_back(asf::Vector3f( 0.3f, -0.5f,  0.5f));
+            m_points.push_back(asf::Vector3f(-0.5f,  0.5f, -0.5f));
+            m_points.push_back(asf::Vector3f(-0.5f,  0.5f, -0.3f));
+            m_points.push_back(asf::Vector3f(-0.5f,  0.5f,  0.3f));
+            m_points.push_back(asf::Vector3f( 0.5f,  0.5f,  0.5f));
+            
             // Compute point cloud bbox;
         }
 
@@ -196,7 +198,16 @@ namespace
 
         float evaluate_field(asf::Vector3f p) const
         {
-            return prim_sphere(p, 5.0f);
+            const float threshold = 10.0;
+            // Compute total field value, influenced by all the points.
+            float field_value = 0;
+            for(size_t i = 0; i < m_points.size(); ++i)
+            {
+                field_value +=  1.0 / asf::square_norm(p - m_points[i]);
+            }
+    
+            // Threshold is the value we want to show.
+            return field_value - threshold;
         }
 
         //
@@ -228,19 +239,6 @@ namespace
         static float op_intersection(const float a, const float b)
         {
             return std::max(a, b);
-        }
-
-        float prim_sphere(const asf::Vector3f& p, const float threshold) const
-        {
-            // Find closest origin.
-            float field_value = 0;
-            for(size_t i = 0; i < m_points.size(); ++i)
-            {
-                field_value +=  1.0 / asf::square_norm(p - m_points[i]);
-            }
-    
-            // Test if inside of the closest sphere.
-            return field_value - threshold;
         }
 
         //
