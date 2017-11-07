@@ -26,6 +26,8 @@
 // THE SOFTWARE.
 //
 
+#include "pointcloudobject.h"
+
 // appleseed.renderer headers.
 #include "renderer/api/object.h"
 #include "renderer/api/project.h"
@@ -60,13 +62,10 @@
 #include <cmath>
 #include <cstddef>
 
-namespace asf = foundation;
-namespace asr = renderer;
-
 namespace
 {
     //
-    // An object whose surface is defined by a signed distance field.
+    // PointCloudObject class implementation.
     //
 
     const char* Model = "point_cloud_object";
@@ -180,7 +179,7 @@ namespace
                     prim_sphere(p, 0.5f));*/
 // 
             // return prim_mandelbulb(p);
-            return prim_sphere(p, 0.1f);
+            return prim_sphere(p, 0.05f);
         }
 
         //
@@ -216,16 +215,18 @@ namespace
 
         static float prim_sphere(const asf::Vector3f& p, const float radius)
         {
-            // Sphere origins
-            // Find closest origin
-            // Test if inside
+            // Define sphere origins.
             std::vector<asf::Vector3f> sphere_origins;
-            sphere_origins.push_back(asf::Vector3f(0.5f, 0.5f, 0.5f));
-            sphere_origins.push_back(asf::Vector3f(-0.9f, -0.9f, 0.5f));
             sphere_origins.push_back(asf::Vector3f(0.0f, 0.0f, 0.5f));
+            sphere_origins.push_back(asf::Vector3f(0.9f, 0.9f, -1.5f));
+            sphere_origins.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
+            sphere_origins.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
+            sphere_origins.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
+            sphere_origins.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
 
+            // Find closest origin.
             size_t closest_sphere_idx = 0;
-            float closest_sphere_distance = asf::norm(p - sphere_origins[closest_sphere_distance]);
+            float closest_sphere_distance = asf::norm(p - sphere_origins[closest_sphere_idx]);
 
             for(size_t i = 1; i < sphere_origins.size(); ++i)
             {
@@ -235,7 +236,8 @@ namespace
                     closest_sphere_idx = i; 
                 }
             }
-            // printf("%zd origin index\n", closest_sphere_idx);
+    
+            // Test if inside of the closest sphere.
             return asf::norm(p - sphere_origins[closest_sphere_idx]) - radius;
         }
 
@@ -351,66 +353,53 @@ namespace
             return false;
         }
     };
-
-
-    //
-    // Factory for the new object model.
-    //
-
-    class PointCloudObjectFactory
-      : public asr::IObjectFactory
-    {
-      public:
-        // Delete this instance.
-        void release() override
-        {
-            delete this;
-        }
-
-        // Return a string identifying this object model.
-        const char* get_model() const override
-        {
-            return Model;
-        }
-
-        // Return metadata for this object model.
-        asf::Dictionary get_model_metadata() const override
-        {
-            return
-                asf::Dictionary()
-                    .insert("name", Model)
-                    .insert("label", "Point Cloud Object");
-        }
-
-        // Return metadata for the inputs of this object model.
-        asf::DictionaryArray get_input_metadata() const override
-        {
-            asf::DictionaryArray metadata;
-            return metadata;
-        }
-
-        // Create a new single empty object.
-        asf::auto_release_ptr<asr::Object> create(
-            const char*                 name,
-            const asr::ParamArray&      params) const override
-        {
-            return asf::auto_release_ptr<asr::Object>(new PointCloudObject(name, params));
-        }
-
-        // Create objects, potentially from external assets.
-        bool create(
-            const char*                 name,
-            const asr::ParamArray&      params,
-            const asf::SearchPaths&     search_paths,
-            const bool                  omit_loading_assets,
-            asr::ObjectArray&           objects) const override
-        {
-            objects.push_back(create(name, params).release());
-            return true;
-        }
-    };
 }
 
+//
+// PointCloudObjectFactory class implementation.
+//
+
+void PointCloudObjectFactory::release()
+{
+    delete this;
+}
+
+const char* PointCloudObjectFactory::get_model() const
+{
+    return Model;
+}
+
+asf::Dictionary PointCloudObjectFactory::get_model_metadata() const
+{
+    return
+        asf::Dictionary()
+            .insert("name", Model)
+            .insert("label", "Point Cloud Object");
+}
+
+asf::DictionaryArray PointCloudObjectFactory::get_input_metadata() const
+{
+    asf::DictionaryArray metadata;
+    return metadata;
+}
+
+asf::auto_release_ptr<asr::Object> PointCloudObjectFactory::create(
+    const char*                 name,
+    const asr::ParamArray&      params) const
+{
+    return asf::auto_release_ptr<asr::Object>(new PointCloudObject(name, params));
+}
+
+bool PointCloudObjectFactory::create(
+    const char*                 name,
+    const asr::ParamArray&      params,
+    const asf::SearchPaths&     search_paths,
+    const bool                  omit_loading_assets,
+    asr::ObjectArray&           objects) const
+{
+    objects.push_back(create(name, params).release());
+    return true;
+}
 
 //
 // Plugin entry point.
