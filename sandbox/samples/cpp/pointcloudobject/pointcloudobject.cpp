@@ -82,12 +82,14 @@ namespace
           , m_lazy_region_kit(&m_region_kit)
         {
             // Define sphere origins.
-            m_points.push_back(asf::Vector3f(0.0f, 0.0f, 0.5f));
+            m_points.push_back(asf::Vector3f(0.0f, 0.0f, -0.5f));
             m_points.push_back(asf::Vector3f(0.9f, 0.9f, -1.5f));
             m_points.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
             m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
             m_points.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
             m_points.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
+
+            // Compute point cloud bbox;
         }
 
         // Delete this instance.
@@ -182,13 +184,7 @@ namespace
 
         float evaluate_field(asf::Vector3f p) const
         {
-            /*return
-                op_substraction(
-                    prim_cube(p + asf::Vector3f(0.5f, 0.0f, 0.0f), 0.5f),
-                    prim_sphere(p, 0.5f));*/
-// 
-            // return prim_mandelbulb(p);
-            return prim_sphere(p, 0.05f);
+            return prim_sphere(p, 5.0f);
         }
 
         //
@@ -222,65 +218,17 @@ namespace
             return std::max(a, b);
         }
 
-        float prim_sphere(const asf::Vector3f& p, const float radius) const
+        float prim_sphere(const asf::Vector3f& p, const float threshold) const
         {
             // Find closest origin.
-            size_t closest_sphere_idx = 0;
-            float closest_sphere_distance = asf::norm(p - m_points[closest_sphere_idx]);
-
-            for(size_t i = 1; i < m_points.size(); ++i)
+            float field_value = 0;
+            for(size_t i = 0; i < m_points.size(); ++i)
             {
-                if(asf::norm(p - m_points[i]) < closest_sphere_distance)
-                {
-                    closest_sphere_distance = asf::norm(p - m_points[i]);
-                    closest_sphere_idx = i; 
-                }
+                field_value +=  1.0 / asf::square_norm(p - m_points[i]);
             }
     
             // Test if inside of the closest sphere.
-            return asf::norm(p - m_points[closest_sphere_idx]) - radius;
-        }
-
-        static float prim_cube(asf::Vector3f p, const float half_size)
-        {
-            p.x = std::max(abs(p.x) - half_size, 0.0f);
-            p.y = std::max(abs(p.y) - half_size, 0.0f);
-            p.z = std::max(abs(p.z) - half_size, 0.0f);
-            return asf::norm(p);
-        }
-
-        static float prim_mandelbulb(const asf::Vector3f& p)
-        {
-            const float Power = 8.0f;
-            const float Bailout = 4.0f;
-            const size_t Iterations = 20;
-
-            asf::Vector3f z = p;
-            float dr = 1.0f;
-            float r = 0.0f;
-
-            for (size_t i = 0; i < Iterations; ++i)
-            {
-                r = asf::norm(z);
-                if (r > Bailout)
-                    break;
-
-                // Convert to polar coordinates.
-                float theta = std::acos(z.z / r);
-                float phi = std::atan2(z.y, z.x);
-                dr = std::pow(r, Power - 1.0f) * Power * dr + 1.0f;
-
-                // Scale and rotate the point.
-                float zr = std::pow(r, Power);
-                theta *= Power;
-                phi *= Power;
-
-                // convert back to cartesian coordinates
-                z = zr * asf::Vector3f(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
-                z += p;
-            }
-
-            return 0.5f * std::log(r) * r / dr;
+            return field_value - threshold;
         }
 
         //
@@ -322,7 +270,7 @@ namespace
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.x)) ^
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.y)) ^
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.z)));
-            const size_t InitialStepCount = 100;
+            const size_t InitialStepCount = 1000;
             size_t level = 1;
             double step_size = (clipped_ray.m_tmax - clipped_ray.m_tmin) / InitialStepCount;
             const double Epsilon = step_size;
