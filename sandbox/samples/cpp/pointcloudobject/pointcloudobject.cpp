@@ -88,6 +88,18 @@ namespace
             m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
             m_points.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
             m_points.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
+            m_points.push_back(asf::Vector3f(0.1f, 0.0f, -0.5f));
+            m_points.push_back(asf::Vector3f(0.3f, 0.2f, -1.5f));
+            m_points.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
+            m_points.push_back(asf::Vector3f(-0.7f, -0.1f, -0.3f));
+            m_points.push_back(asf::Vector3f(0.5f, 0.9f, 1.0f));
+            m_points.push_back(asf::Vector3f(-0.11f, -0.9f, -0.5f));
+            m_points.push_back(asf::Vector3f(-1.0f, 0.0f, -0.5f));
+            m_points.push_back(asf::Vector3f(1.9f, 0.9f, -1.5f));
+            m_points.push_back(asf::Vector3f(0.5f, -0.3f, 0.2f));
+            m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
+            m_points.push_back(asf::Vector3f(0.2f, 0.7f, 1.0f));
+            m_points.push_back(asf::Vector3f(-0.9f, -0.5f, 0.5f));
 
             // Compute point cloud bbox;
         }
@@ -107,7 +119,7 @@ namespace
         // Compute the local space bounding box of the object over the shutter interval.
         asr::GAABB3 compute_local_bbox() const override
         {
-            return asr::GAABB3(asr::GVector3(-2.0f), asr::GVector3(2.0f));
+            return asr::GAABB3(asr::GVector3(-5.0f), asr::GVector3(5.0f));
         }
 
         // Return the region kit of the object.
@@ -270,7 +282,7 @@ namespace
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.x)) ^
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.y)) ^
                 asf::hash_uint64(asf::binary_cast<asf::uint64>(ray.m_dir.z)));
-            const size_t InitialStepCount = 1000;
+            const size_t InitialStepCount = 100;
             size_t level = 1;
             double step_size = (clipped_ray.m_tmax - clipped_ray.m_tmin) / InitialStepCount;
             const double Epsilon = step_size;
