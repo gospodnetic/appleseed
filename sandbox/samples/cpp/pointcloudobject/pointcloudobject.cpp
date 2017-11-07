@@ -81,6 +81,13 @@ namespace
           : asr::ProceduralObject(name, params)
           , m_lazy_region_kit(&m_region_kit)
         {
+            // Define sphere origins.
+            m_points.push_back(asf::Vector3f(0.0f, 0.0f, 0.5f));
+            m_points.push_back(asf::Vector3f(0.9f, 0.9f, -1.5f));
+            m_points.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
+            m_points.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
+            m_points.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
+            m_points.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
         }
 
         // Delete this instance.
@@ -161,6 +168,8 @@ namespace
         asr::RegionKit              m_region_kit;
         asf::Lazy<asr::RegionKit>   m_lazy_region_kit;
 
+        std::vector<asf::Vector3f>  m_points;
+
         //
         // Signed distance function.
         //
@@ -171,7 +180,7 @@ namespace
         //   http://blog.hvidtfeldts.net/index.php/2011/09/distance-estimated-3d-fractals-v-the-mandelbulb-different-de-approximations/
         //
 
-        static float evaluate_field(asf::Vector3f p)
+        float evaluate_field(asf::Vector3f p) const
         {
             /*return
                 op_substraction(
@@ -213,32 +222,23 @@ namespace
             return std::max(a, b);
         }
 
-        static float prim_sphere(const asf::Vector3f& p, const float radius)
+        float prim_sphere(const asf::Vector3f& p, const float radius) const
         {
-            // Define sphere origins.
-            std::vector<asf::Vector3f> sphere_origins;
-            sphere_origins.push_back(asf::Vector3f(0.0f, 0.0f, 0.5f));
-            sphere_origins.push_back(asf::Vector3f(0.9f, 0.9f, -1.5f));
-            sphere_origins.push_back(asf::Vector3f(0.5f, -0.9f, 0.2f));
-            sphere_origins.push_back(asf::Vector3f(-0.9f, 0.9f, -0.3f));
-            sphere_origins.push_back(asf::Vector3f(0.2f, 0.9f, 1.0f));
-            sphere_origins.push_back(asf::Vector3f(-0.9f, -0.9f, -0.5f));
-
             // Find closest origin.
             size_t closest_sphere_idx = 0;
-            float closest_sphere_distance = asf::norm(p - sphere_origins[closest_sphere_idx]);
+            float closest_sphere_distance = asf::norm(p - m_points[closest_sphere_idx]);
 
-            for(size_t i = 1; i < sphere_origins.size(); ++i)
+            for(size_t i = 1; i < m_points.size(); ++i)
             {
-                if(asf::norm(p - sphere_origins[i]) < closest_sphere_distance)
+                if(asf::norm(p - m_points[i]) < closest_sphere_distance)
                 {
-                    closest_sphere_distance = asf::norm(p - sphere_origins[i]);
+                    closest_sphere_distance = asf::norm(p - m_points[i]);
                     closest_sphere_idx = i; 
                 }
             }
     
             // Test if inside of the closest sphere.
-            return asf::norm(p - sphere_origins[closest_sphere_idx]) - radius;
+            return asf::norm(p - m_points[closest_sphere_idx]) - radius;
         }
 
         static float prim_cube(asf::Vector3f p, const float half_size)
@@ -293,12 +293,12 @@ namespace
         //   http://erleuchtet.org/~cupe/permanent/enhanced_sphere_tracing.pdf
         //
 
-        static float evaluate_field(const double x, const double y, const double z)
+        float evaluate_field(const double x, const double y, const double z) const
         {
             return evaluate_field(asf::Vector3d(x, y, z));
         }
 
-        static float evaluate_field(const asf::Vector3d& p)
+        float evaluate_field(const asf::Vector3d& p) const
         {
             return evaluate_field(asf::Vector3f(p));
         }
