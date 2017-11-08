@@ -80,6 +80,8 @@ namespace
             const asr::ParamArray&      params)
           : asr::ProceduralObject(name, params)
           , m_lazy_region_kit(&m_region_kit)
+          , m_bbox_min(0.0f, 0.0f, 0.0f)
+          , m_bbox_max(0.0f, 0.0f, 0.0f)
         {
             // Define a cube.
             m_points.push_back(asf::Vector3f(-0.5f, -0.5f, -0.5f));
@@ -103,7 +105,33 @@ namespace
             m_points.push_back(asf::Vector3f(-0.5f,  0.5f,  0.3f));
             m_points.push_back(asf::Vector3f( 0.5f,  0.5f,  0.5f));
             
-            // Compute point cloud bbox;
+            // Compute point cloud bbox.
+            for(size_t i = 0; i < m_points.size(); ++i)
+            {
+                if(m_points[i][0] < m_bbox_min[0])
+                    m_bbox_min[0] = m_points[i][0];
+                else if(m_points[i][0] > m_bbox_max[0])
+                    m_bbox_max[0] = m_points[i][0];
+                
+                if(m_points[i][1] < m_bbox_min[1])
+                    m_bbox_min[1] = m_points[i][1];
+                else if(m_points[i][1] > m_bbox_max[1])
+                    m_bbox_max[1] = m_points[i][1];
+                
+                if(m_points[i][2] < m_bbox_min[2])
+                    m_bbox_min[2] = m_points[i][2];
+                else if(m_points[i][2] > m_bbox_max[2])
+                    m_bbox_max[2] = m_points[i][2];
+            }
+
+            // Add tolerance to bbox.
+            const float Epsilon = 0.1f;
+            m_bbox_min[0] = m_bbox_min[0] - Epsilon;
+            m_bbox_min[1] = m_bbox_min[1] - Epsilon;
+            m_bbox_min[2] = m_bbox_min[2] - Epsilon;
+            m_bbox_max[0] = m_bbox_max[0] + Epsilon;
+            m_bbox_max[1] = m_bbox_max[1] + Epsilon;
+            m_bbox_max[2] = m_bbox_max[2] + Epsilon;
         }
 
         // Delete this instance.
@@ -185,7 +213,8 @@ namespace
         asf::Lazy<asr::RegionKit>   m_lazy_region_kit;
 
         std::vector<asf::Vector3f>  m_points;
-
+        asf::Vector3f               m_bbox_min;
+        asf::Vector3f               m_bbox_max;
         //
         // Signed distance function.
         //
@@ -198,6 +227,14 @@ namespace
 
         float evaluate_field(asf::Vector3f p) const
         {
+            const bool inside = 
+                p[0] >= m_bbox_min[0] && p[0] <= m_bbox_max[0] &&
+                p[1] >= m_bbox_min[1] && p[1] <= m_bbox_max[1] &&
+                p[2] >= m_bbox_min[2] && p[2] <= m_bbox_max[2];
+            
+            if(!inside)
+                return 0.0f;
+
             const float threshold = 10.0;
             // Compute total field value, influenced by all the points.
             float field_value = 0;
