@@ -188,13 +188,20 @@ namespace
                     evaluate_field(p.x + H, p.y, p.z) - evaluate_field(p.x - H, p.y, p.z),
                     evaluate_field(p.x, p.y + H, p.z) - evaluate_field(p.x, p.y - H, p.z),
                     evaluate_field(p.x, p.y, p.z + H) - evaluate_field(p.x, p.y, p.z - H));
-                n = asf::normalize(n);
 
-                result.m_geometric_normal = asf::Vector3d(n);
-                result.m_shading_normal = asf::Vector3d(n);
+                // TODO: fix hack, why is it being charcterized as a hit if normal is (0, 0, 0)?
+                if(n == asf::Vector3f(0, 0, 0))
+                    result.m_hit = false;
+                else
+                {
+                    n = asf::normalize(n);
 
-                result.m_uv = asf::Vector2f(0.0f);
-                result.m_material_slot = 0;
+                    result.m_geometric_normal = asf::Vector3d(n);
+                    result.m_shading_normal = asf::Vector3d(n);
+
+                    result.m_uv = asf::Vector2f(0.0f);
+                    result.m_material_slot = 0;
+                }
             }
         }
 
@@ -227,6 +234,7 @@ namespace
 
         float evaluate_field(asf::Vector3f p) const
         {
+            // Evaluate the field only if the point is within the bounding box.
             const bool inside = 
                 p[0] >= m_bbox_min[0] && p[0] <= m_bbox_max[0] &&
                 p[1] >= m_bbox_min[1] && p[1] <= m_bbox_max[1] &&
@@ -235,16 +243,20 @@ namespace
             if(!inside)
                 return 0.0f;
 
-            const float threshold = 10.0;
+
+            const float Radius = 0.2f;
+            const float Threshold = 10.0f;
             // Compute total field value, influenced by all the points.
             float field_value = 0;
             for(size_t i = 0; i < m_points.size(); ++i)
             {
-                field_value +=  1.0 / asf::square_norm(p - m_points[i]);
+                // Check if the point is within a certain radius which is allowed to impact the field.
+                if(asf::square_norm(p - m_points[i]) - Radius < 0)
+                    field_value +=  1.0f / asf::square_norm(p - m_points[i]);
             }
     
             // Threshold is the value we want to show.
-            return field_value - threshold;
+            return field_value - Threshold;
         }
 
         //
