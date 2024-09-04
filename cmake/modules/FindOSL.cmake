@@ -39,6 +39,13 @@
 #   OSL_QUERY_INFO      Path to oslinfo binary
 #   OSL_MAKETX          Path to OpenImageIO's maketx binary
 #
+# If OSL_ROOT is defined, it will try to look for OSL libs there
+# as well (OSL_ROOT is expected to point to OSL dist directory).
+#
+
+if (DEFINED OSL_ROOT)
+    list (APPEND CMAKE_PREFIX_PATH ${OSL_ROOT})
+endif()
 
 include (FindPackageHandleStandardArgs)
 
