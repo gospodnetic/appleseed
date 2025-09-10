@@ -134,49 +134,56 @@ namespace foundation
             std::vector<std::string> group_names = get_group_names(plyIn);
             std::vector<std::vector<size_t>> group_faces = get_group_faces(plyIn);
 
-            std::cout << "Groups:" << std::endl;
             for (size_t i = 0; i < group_names.size(); i++)
             {
-                std::cout << "Group id: " << i << ", name: ";
-                std::cout << group_names[i] << std::endl;
-
-                for (const auto& fi : group_faces[i])
-                    std::cout << fi << " ";
-                std::cout << std::endl;
-            }
-
-            for (size_t i = 0; i < group_names.size(); i++)
-            {
-                std::cout << "Processing group " << group_names[i] << std::endl;
                 impl.m_current_mesh_name = group_names[i];
                 impl.ensure_mesh_def();
-    
+
+                std::map<size_t, size_t> vertex_remapping;
+                size_t new_vertex_count = 0;
+
+                const size_t material_slot = impl.m_builder.push_material_slot("default");
+
                 for (const auto& face_idx : group_faces[i])
                 {
-                    std::cout << "Processing face idx " << face_idx << std::endl;
+                    const auto& face_vertex_indices = faces[face_idx];
+                    std::vector<size_t> new_face_vertices;
+                    new_face_vertices.reserve(face_vertex_indices.size());
 
-                    std::vector<size_t> face_vertices = faces[face_idx];
-                    for (const auto& v_idx : face_vertices)
+                    for (const auto& old_vertex_index : face_vertex_indices)
                     {
-                        impl.m_builder.push_vertex(
-                            Vector3d(
-                                vertices[v_idx][0],
-                                vertices[v_idx][1],
-                                vertices[v_idx][2]));
-                        impl.m_builder.push_vertex_normal(
-                            Vector3d(
-                                vertex_normals[v_idx][0],
-                                vertex_normals[v_idx][1],
-                                vertex_normals[v_idx][2]));
+                        auto it = vertex_remapping.find(old_vertex_index);
+                        if (it == vertex_remapping.end())
+                        {
+                            impl.m_builder.push_vertex(Vector3d(
+                                vertices[old_vertex_index][0],
+                                vertices[old_vertex_index][1],
+                                vertices[old_vertex_index][2]));
+
+                            if (!vertex_normals.empty())
+                            {
+                                impl.m_builder.push_vertex_normal(Vector3d(
+                                    vertex_normals[old_vertex_index][0],
+                                    vertex_normals[old_vertex_index][1],
+                                    vertex_normals[old_vertex_index][2]));
+                            }
+
+                            vertex_remapping[old_vertex_index] = new_vertex_count;
+                            new_face_vertices.push_back(new_vertex_count);
+                            new_vertex_count++;
+                        }
+                        else
+                        {
+                            new_face_vertices.push_back(it->second);
+                        }
                     }
 
-                    const auto& face = faces[face_idx];
-                    impl.m_builder.begin_face(face.size());
-                    impl.m_builder.set_face_vertices(&face.front());
+                    impl.m_builder.begin_face(new_face_vertices.size());
+                    impl.m_builder.set_face_vertices(new_face_vertices.data());
+                    impl.m_builder.set_face_material(material_slot);
                     impl.m_builder.end_face();
                 }
                 impl.end_mesh_def();
-                std::cout << "Ending mesh " << std::endl;
             }
         }
         else
@@ -192,7 +199,6 @@ namespace foundation
             for (const auto& vertex_normal : vertex_normals)
             {
                 impl.m_builder.push_vertex_normal(Vector3d(vertex_normal[0], vertex_normal[1], vertex_normal[2]));
-                std::cout << "Pushing normal " << vertex_normal[0] << ", " << vertex_normal[1] << ", " << vertex_normal[2] << std::endl;
             }
     
             for (const auto& face : faces)
